@@ -8,6 +8,7 @@ public class Music.AudioObject : Object {
     public Gdk.Texture texture { get; set; }
     public string artist { get; set; }
     public string title { get; set; }
+    public string album { get; set; }
     public int64 duration { get; set; default = 0; }
 
     public AudioObject (string uri) {

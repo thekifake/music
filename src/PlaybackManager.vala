@@ -26,6 +26,7 @@ public class Music.PlaybackManager : Object {
     }
 
     private bool next_by_eos = false;
+    private bool done_discovering = false;
 
     private Direction direction = Direction.NONE;
 
@@ -43,7 +44,10 @@ public class Music.PlaybackManager : Object {
         try {
             discoverer = new Gst.PbUtils.Discoverer ((Gst.ClockTime) (5 * Gst.SECOND));
             discoverer.discovered.connect (update_metadata);
-            discoverer.finished.connect (discoverer.stop);
+            discoverer.finished.connect (() => {
+                done_discovering = true;
+                discoverer.stop();
+            });
         } catch (Error e) {
             critical ("Unable to start Gstreamer Discoverer: %s", e.message);
         }
@@ -58,8 +62,14 @@ public class Music.PlaybackManager : Object {
         notify["current-audio"].connect (() => {
             playbin.set_state (Gst.State.NULL);
             if (current_audio != null) {
+                var lf = Lastfm.get_default();
                 playbin.uri = current_audio.uri;
                 playbin.set_state (Gst.State.PLAYING);
+                if (lf.authenticated) {
+                    discoverer.finished.connect_after (() => {
+                        lf.set_now_playing.begin ();
+                    });
+                }
             } else {
                 playbin.uri = "";
                 playback_position = 0;
@@ -188,6 +198,14 @@ public class Music.PlaybackManager : Object {
                 audio_object.artist = _artist;
             } else if (_title != null) { // Don't set artist for files without tags
                 audio_object.artist = _("Unknown");
+            }
+
+            string _album;
+            tag_list.get_string (Gst.Tags.ALBUM, out _album);
+            if (_album != null) {
+                audio_object.album = _album;
+            } else if (_title != null) {
+                audio_object.album = _("Unknown");
             }
 
             var sample = get_cover_sample (tag_list);

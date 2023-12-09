@@ -13,6 +13,7 @@ public class Music.ConnectLastfm : Gtk.Popover {
         var lf = Lastfm.get_default ();
         stack = new Gtk.Stack() {
             transition_type = OVER_LEFT_RIGHT,
+            transition_duration = 400,
             margin_top = 24,
             margin_bottom = 24,
             margin_start = 24,
@@ -47,23 +48,23 @@ public class Music.ConnectLastfm : Gtk.Popover {
         var temp_auth_box = new Gtk.Box (VERTICAL, 12);
         {
             var label = new Gtk.Label("Loading user information...");
+            temp_auth_box.append(label);
+            var dc_button = new Gtk.Button.with_label("Disconnect");
+            temp_auth_box.append(dc_button);
         }
         stack.add_named (temp_auth_box, "auth");
-
 
         finalize_button.clicked.connect (() => {
             connect_button.sensitive = false;
             finalize_button.sensitive = false;
             lf.end_authenticate.begin ((obj, res) => {
                 var key = lf.end_authenticate.end (res);
-                settings.set_string ("lastfm-session-key", key);
-                settings.set_string ("lastfm-username", lf.name);
                 replace_auth_box(temp_auth_box);
                 stack.set_visible_child_name ("auth");
             });
         });
 
-        if (settings.get_string ("lastfm-session-key") == "none") {
+        if (!lf.authenticated) {
             stack.set_visible_child_name ("unauth");
         } else {
             stack.set_visible_child_name ("auth");
@@ -99,12 +100,15 @@ public class Music.ConnectLastfm : Gtk.Popover {
             halign = CENTER
         };
 
-        var userinfo = (yield lf.request("user.getInfo", @"&user=$(settings.get_string("lastfm-username"))")).get_root().get_object().get_object_member("user");
+        var pars = new Gee.TreeMap<string, string>(null, null);
+        pars.set("user", settings.get_string("lastfm-username"));
+        var userinfo = (yield lf.request("user.getInfo", pars))
+                       .get_root().get_object().get_object_member("user");
 
         var avatar_url = userinfo.get_array_member("image").get_element(2).get_object().get_string_member("#text");
         print ("URL: %s\n", avatar_url);
         var avatar_image = new Gtk.Image.from_pixbuf(yield get_image(avatar_url));
-        avatar_image.set_pixel_size(150);
+        avatar_image.set_pixel_size(125);
         box.append(avatar_image);
 
         var header_label = new Gtk.Label(userinfo.get_string_member("name"));
@@ -116,6 +120,10 @@ public class Music.ConnectLastfm : Gtk.Popover {
         var plays_label = new Gtk.Label(@"$(userinfo.get_string_member("playcount")) scrobbles | Joined $joined_date");
         plays_label.add_css_class(Granite.STYLE_CLASS_H4_LABEL);
         box.append(plays_label);
+
+        // TODO
+        var dc_button = new Gtk.Button.with_label("Disconnect");
+        box.append(dc_button);
 
         return box;
     }

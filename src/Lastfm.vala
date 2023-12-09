@@ -1,9 +1,11 @@
 public class Music.Lastfm : GLib.Object {
+    public bool authenticated = false;
+
     private Soup.Session session;
     private Json.Parser parser;
+    private Settings settings;
 
     private string token;
-    public string name;
 
     private static GLib.Once<Lastfm> _instance;
     public static unowned Lastfm get_default() {
@@ -13,11 +15,42 @@ public class Music.Lastfm : GLib.Object {
     construct {
         session = new Soup.Session();
         parser = new Json.Parser();
+        settings = new Settings("io.elementary.music");
+        if (settings.get_string ("lastfm-session-key") != "none" && settings.get_string ("lastfm-username") != "none") authenticated = true;
     }
 
-    public async Json.Parser? request(string method, string? parameters) {
-        string url = @"http://ws.audioscrobbler.com/2.0/?method=$method&api_key=$(Constants.LASTFM_API_KEY)&format=json$parameters";
-        var message = new Soup.Message("GET", url);
+    public async Json.Parser? request(string func, Gee.TreeMap<string, string>? parameters, string? method = "GET", bool? use_key = false) {
+        print ("====== LAST.FM REQUEST ======\n");
+        var pars = new Gee.TreeMap<string, string>(null, null);
+        pars.set("api_key", Constants.LASTFM_API_KEY);
+        pars.set("method", func);
+        if (use_key) {
+            var key = settings.get_string ("lastfm-session-key");
+            if (key == "none") warning ("Key does not exist (yet)");
+            pars.set("sk", key);
+        }
+
+        parameters.map_iterator().foreach((k, v) => {
+            pars.set(k, v);
+            return true;
+        });
+
+        string html_pars = "?";
+        string plain_sig = "";
+        pars.map_iterator().foreach((k, v) => {
+            html_pars += @"$k=$(Uri.escape_string(v, null, true))&";
+            plain_sig += @"$k$v";
+            return true;
+        });
+        html_pars = html_pars.slice(0, -1);
+        plain_sig += Constants.LASTFM_SHARED_SECRET;
+        var sig = GLib.Checksum.compute_for_string (MD5, plain_sig, plain_sig.length).to_string();
+        print ("Generated signature: %s\n", sig);
+
+        string url = @"http://ws.audioscrobbler.com/2.0/$html_pars&format=json&api_sig=$sig";
+        print("Generated URI: %s\n", url);
+
+        var message = new Soup.Message(method, url);
         try {
             var res = yield session.send_async (message, GLib.Priority.DEFAULT, null);
 
@@ -29,7 +62,7 @@ public class Music.Lastfm : GLib.Object {
             parser.load_from_data((string) data, (ssize_t) bytes_read);
             return parser;
         } catch (Error e) {
-            warning (@"Couldn't send request to $method ($(e.message))\n");
+            warning (@"Couldn't send request to $func ($(e.message))\n");
             return null;
         }
     }
@@ -51,17 +84,38 @@ public class Music.Lastfm : GLib.Object {
     }
 
     public async string end_authenticate() {
-        var plain_sig = @"api_key$(Constants.LASTFM_API_KEY)methodauth.getSessiontoken$token$(Constants.LASTFM_SHARED_SECRET)";
-        print ("Signature is %s\n", plain_sig);
-        var sig = GLib.Checksum.compute_for_string (MD5, plain_sig, plain_sig.length).to_string();
-        yield request("auth.getSession", @"&token=$token&api_sig=$sig");
+        var pars = new Gee.TreeMap<string, string>(null, null);
+        pars.set("token", token);
+        yield request("auth.getSession", pars);
         var session = parser.get_root().get_object().get_object_member("session");
         if (session == null) {
             error ("Improper session");
         }
         var key = session.get_string_member("key");
-        name = session.get_string_member("name");
+        var name = session.get_string_member("name");
         print ("key %s, name: %s\n", key, name);
+        settings.set_string ("lastfm-session-key", key);
+        settings.set_string ("lastfm-username", name);
+        authenticated = true;
         return key;
+    }
+
+    public async void set_now_playing() {
+        var song = PlaybackManager.get_default().current_audio;
+        if (song == null) {
+            warning ("Song not found");
+            return;
+        }
+        var fields = new Gee.TreeMap<string, string> (null, null);
+        int duration = (int) (song.duration / 1000000000);
+        print("Fields info:\n\ttitle:     %s\n\tartist:    %s\n\talbum:     %s\n\tduration:  %i seconds\n", song.title, song.artist, song.album, duration);
+        if (song.title != null) {
+            fields.set("track", song.title);
+            fields.set("duration", duration.to_string());
+            if (song.artist != null) fields.set("artist", song.artist);
+            if (song.album != null) fields.set("album", song.album);
+        }
+
+        yield request("track.updateNowPlaying", fields, "POST", true);
     }
 }
