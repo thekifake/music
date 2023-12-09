@@ -14,6 +14,13 @@ You'll need the following dependencies:
 * meson
 * valac
 
+You'll need to [create your own Last.fm API account](https://www.last.fm/api/account/create) and add the API key and shared secret to .env:
+
+```
+LASTFM_API_KEY=[ KEY ]
+LASTFM_SHARED_SECRET=[ SECRET ]
+```
+
 It's recommended to create a clean build environment. Run `meson` to configure the build environment and then `ninja` to build
 
     meson build --prefix=/usr

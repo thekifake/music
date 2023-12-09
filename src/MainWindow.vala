@@ -75,6 +75,14 @@ public class Music.MainWindow : Gtk.ApplicationWindow {
         end_header.add_css_class (Granite.STYLE_CLASS_DEFAULT_DECORATION);
         end_header.pack_end (end_window_controls);
 
+        var connect_lastfm_button = new Gtk.MenuButton () {
+            direction = DOWN,
+            tooltip_text = _("Connect last.fm"),
+            icon_name = "network-wireless-hotspot-symbolic",
+            popover = new ConnectLastfm(this)
+        };
+        end_header.pack_end (connect_lastfm_button);
+
         var now_playing_view = new NowPlayingView () {
             margin_top = 12,
             margin_end = 12,
