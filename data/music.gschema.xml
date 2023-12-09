@@ -34,5 +34,17 @@
       <summary>Pane position between the queue and now playing view</summary>
       <description>Pane position between the queue and now playing view</description>
     </key>
+
+    <key name="lastfm-session-key" type="s"> <!-- Needs to be stored more securely -->
+      <default>'none'</default>
+      <summary>Last.fm session key</summary>
+      <description>Last.fm session key for making user requests</description>
+    </key>
+
+    <key name="lastfm-username" type="s">
+      <default>'none'</default>
+      <summary>Last.fm username</summary>
+      <description>Last.fm username of the currently logged in user</description>
+    </key>
   </schema>
 </schemalist>

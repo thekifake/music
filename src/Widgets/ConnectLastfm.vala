@@ -1,29 +1,123 @@
 public class Music.ConnectLastfm : Gtk.Popover {
-    private Gtk.Window window;
+    private MainWindow window;
+    private Settings settings;
+    private Gtk.Stack stack;
 
-    public ConnectLastfm(Gtk.Window window) {
+    public ConnectLastfm(MainWindow window) {
         this.window = window;
     }
 
     construct {
-        var box = new Gtk.Box (VERTICAL, 12) {
+        settings = new Settings ("io.elementary.music");
+
+        var lf = Lastfm.get_default ();
+        stack = new Gtk.Stack() {
+            transition_type = OVER_LEFT_RIGHT,
             margin_top = 24,
             margin_bottom = 24,
             margin_start = 24,
             margin_end = 24
         };
 
-        var label = new Gtk.Label ("Click the below button to open a prompt to authenticate with last.fm.");
-        box.append (label);
+        var unauth_box = new Gtk.Box (VERTICAL, 12);
+        var connect_label = new Gtk.Label (_("Click Authenticate to open a prompt to authenticate with last.fm."));
+        unauth_box.append (connect_label);
 
-        var btn = new Gtk.Button.with_label ("Connect");
-        btn.add_css_class (Granite.STYLE_CLASS_SUGGESTED_ACTION);
-        btn.clicked.connect (() => {
+        var connect_button = new Gtk.Button.with_label (_("Authenticate"));
+        connect_button.add_css_class (Granite.STYLE_CLASS_SUGGESTED_ACTION);
+
+
+        var finalize_button = new Gtk.Button.with_label (_("Connect"));
+
+        connect_button.clicked.connect (() => {
             popdown();
-            Lastfm.get_default ().authenticate.begin (window);
+            connect_button.sensitive = false;
+            lf.begin_authenticate.begin (window, () => {
+                connect_button.sensitive = true;
+                finalize_button.sensitive = true;
+            });
         });
-        box.append (btn);
+        unauth_box.append (connect_button);
 
-        child = box;
+        var finalize_label = new Gtk.Label (_("After you've granted Music access to your account, click Connect."));
+        unauth_box.append (finalize_label);
+        unauth_box.append (finalize_button);
+        stack.add_named (unauth_box, "unauth");
+
+        var temp_auth_box = new Gtk.Box (VERTICAL, 12);
+        {
+            var label = new Gtk.Label("Loading user information...");
+        }
+        stack.add_named (temp_auth_box, "auth");
+
+
+        finalize_button.clicked.connect (() => {
+            connect_button.sensitive = false;
+            finalize_button.sensitive = false;
+            lf.end_authenticate.begin ((obj, res) => {
+                var key = lf.end_authenticate.end (res);
+                settings.set_string ("lastfm-session-key", key);
+                settings.set_string ("lastfm-username", lf.name);
+                replace_auth_box(temp_auth_box);
+                stack.set_visible_child_name ("auth");
+            });
+        });
+
+        if (settings.get_string ("lastfm-session-key") == "none") {
+            stack.set_visible_child_name ("unauth");
+        } else {
+            stack.set_visible_child_name ("auth");
+            replace_auth_box(temp_auth_box);
+        }
+        child = stack;
+    }
+
+    private void replace_auth_box(Gtk.Widget replacement) { // meh.....
+        render_auth_box.begin((obj, res) => {
+            var auth_box = render_auth_box.end(res);
+            stack.remove(replacement);
+            stack.add_named (auth_box, "auth");
+        });
+    }
+
+    public async Gdk.Pixbuf? get_image(string url) {
+        var session = new Soup.Session();
+        var msg = new Soup.Message("GET", url);
+        try {
+            var res = yield session.send_async(msg, Priority.LOW, null);
+            return yield new Gdk.Pixbuf.from_stream_async(res, null);
+        } catch (Error e) {
+            warning ("Couldn't get image from server (%s)", e.message);
+            return null;
+        }
+    }
+
+    public async Gtk.Box render_auth_box() {
+        var lf = Lastfm.get_default();
+        var box = new Gtk.Box (VERTICAL, 12) {
+            valign = CENTER,
+            halign = CENTER
+        };
+
+        var userinfo = (yield lf.request("user.getInfo", @"&user=$(settings.get_string("lastfm-username"))")).get_root().get_object().get_object_member("user");
+
+        var avatar_url = userinfo.get_array_member("image").get_element(2).get_object().get_string_member("#text");
+        print ("URL: %s\n", avatar_url);
+        var avatar_image = new Gtk.Image.from_pixbuf(yield get_image(avatar_url));
+        avatar_image.set_pixel_size(150);
+        box.append(avatar_image);
+
+        var header_label = new Gtk.Label(userinfo.get_string_member("name"));
+        header_label.add_css_class (Granite.STYLE_CLASS_H2_LABEL);
+        box.append(header_label);
+
+        var unjoined_date = userinfo.get_object_member("registered").get_string_member("unixtime");
+        var joined_date = new DateTime.from_unix_utc(int64.parse(unjoined_date, 10)).format("%B %d, %Y");
+        var plays_label = new Gtk.Label(@"$(userinfo.get_string_member("playcount")) scrobbles | Joined $joined_date");
+        plays_label.add_css_class(Granite.STYLE_CLASS_H4_LABEL);
+        box.append(plays_label);
+
+        return box;
     }
 }
+
