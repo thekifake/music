@@ -46,5 +46,11 @@
       <summary>Last.fm username</summary>
       <description>Last.fm username of the currently logged in user</description>
     </key>
+
+    <key name="scrobble-min-time" type="i">
+      <default>60</default>
+      <summary>Minimum scrobble time</summary>
+      <description>How long a song needs to play (in seconds) before it is marked as scrobbled</description>
+    </key>
   </schema>
 </schemalist>

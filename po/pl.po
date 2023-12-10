@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: beat-box 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-31 15:44+0000\n"
+"POT-Creation-Date: 2023-12-10 00:56-0500\n"
 "PO-Revision-Date: 2022-11-19 05:10+0000\n"
 "Last-Translator: Marcin Serwin <marcin.serwin0@protonmail.com>\n"
 "Language-Team: Polish <https://l10n.elementary.io/projects/music/music/pl/>\n"
@@ -37,7 +37,11 @@ msgstr "Kolejka jest pusta"
 msgid "Audio files opened from Files will appear here"
 msgstr "Pliki audio otwarte przez Pliki pojawią się tutaj"
 
-#: src/MainWindow.vala:144
+#: src/MainWindow.vala:80
+msgid "Connect last.fm"
+msgstr ""
+
+#: src/MainWindow.vala:152
 #, c-format
 msgid "%d invalid file was not added to the queue"
 msgid_plural "%d invalid files were not added to the queue"
@@ -45,19 +49,19 @@ msgstr[0] "%d niepoprawny plik nie został dodana do kolejki"
 msgstr[1] "%d niepoprawne pliki nie zostały dodane do kolejki"
 msgstr[2] "%d niepoprawnych plików nie zostało dodanych do kolejki"
 
-#: src/MainWindow.vala:191
+#: src/MainWindow.vala:199
 msgid "Repeat None"
 msgstr "Nie powtarzaj"
 
-#: src/MainWindow.vala:195
+#: src/MainWindow.vala:203
 msgid "Repeat All"
 msgstr "Powtarzaj wszystko"
 
-#: src/MainWindow.vala:199
+#: src/MainWindow.vala:207
 msgid "Repeat One"
 msgstr "Powtarzaj jedno"
 
-#: src/PlaybackManager.vala:130
+#: src/PlaybackManager.vala:136
 #, c-format
 msgid "%d track was added to the queue"
 msgid_plural "%d tracks were added to the queue"
@@ -66,7 +70,7 @@ msgstr[1] "%d piosenki zostały dodane do kolejki"
 msgstr[2] "%d piosenek zostało dodane do kolejki"
 
 #. Don't set artist for files without tags
-#: src/PlaybackManager.vala:190
+#: src/PlaybackManager.vala:196 src/PlaybackManager.vala:204
 msgid "Unknown"
 msgstr "Nieznany"
 

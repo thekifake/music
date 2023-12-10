@@ -1,5 +1,6 @@
 public class Music.Lastfm : GLib.Object {
     public bool authenticated = false;
+    public Gee.TreeMap<string, string> song_pars;
 
     private Soup.Session session;
     private Json.Parser parser;
@@ -100,22 +101,36 @@ public class Music.Lastfm : GLib.Object {
         return key;
     }
 
-    public async void set_now_playing() {
+    public void set_song_pars() {
         var song = PlaybackManager.get_default().current_audio;
         if (song == null) {
             warning ("Song not found");
             return;
         }
-        var fields = new Gee.TreeMap<string, string> (null, null);
+        if (song.title == song_pars.get("track")) {
+            print ("%s is already loaded", song_pars.get("track"));
+            return;
+        }
+        song_pars = new Gee.TreeMap<string, string> (null, null);
         int duration = (int) (song.duration / 1000000000);
         print("Fields info:\n\ttitle:     %s\n\tartist:    %s\n\talbum:     %s\n\tduration:  %i seconds\n", song.title, song.artist, song.album, duration);
         if (song.title != null) {
-            fields.set("track", song.title);
-            fields.set("duration", duration.to_string());
-            if (song.artist != null) fields.set("artist", song.artist);
-            if (song.album != null) fields.set("album", song.album);
+            song_pars.set("track", song.title);
+            song_pars.set("duration", duration.to_string());
+            if (song.artist != null) song_pars.set("artist", song.artist);
+            if (song.album != null) song_pars.set("album", song.album);
         }
+    }
 
-        yield request("track.updateNowPlaying", fields, "POST", true);
+    public async void set_now_playing() {
+        set_song_pars();
+        yield request("track.updateNowPlaying", song_pars, "POST", true);
+    }
+
+    // TODO scrobble after scrobble-min-time
+    public async void scrobble() {
+        set_song_pars();
+        song_pars.set("timestamp", Gdk.CURRENT_TIME.to_string());
+        yield request("track.scrobble", song_pars, "POST", true);
     }
 }

@@ -26,7 +26,6 @@ public class Music.PlaybackManager : Object {
     }
 
     private bool next_by_eos = false;
-    private bool done_discovering = false;
 
     private Direction direction = Direction.NONE;
 
@@ -44,10 +43,7 @@ public class Music.PlaybackManager : Object {
         try {
             discoverer = new Gst.PbUtils.Discoverer ((Gst.ClockTime) (5 * Gst.SECOND));
             discoverer.discovered.connect (update_metadata);
-            discoverer.finished.connect (() => {
-                done_discovering = true;
-                discoverer.stop();
-            });
+            discoverer.finished.connect (discoverer.stop);
         } catch (Error e) {
             critical ("Unable to start Gstreamer Discoverer: %s", e.message);
         }

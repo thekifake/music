@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: noise\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-31 15:44+0000\n"
+"POT-Creation-Date: 2023-12-10 00:56-0500\n"
 "PO-Revision-Date: 2020-01-05 14:18+0000\n"
 "Last-Translator: Marko <marko.dolar@gmail.com>\n"
 "Language-Team: Slovenian <https://l10n.elementary.io/projects/music/music/sl/"
@@ -16,8 +16,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
-"%100==4 ? 2 : 3;\n"
+"Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
+"n%100==4 ? 2 : 3;\n"
 "X-Generator: Weblate 3.9.1\n"
 "X-Launchpad-Export-Date: 2017-03-07 05:54+0000\n"
 
@@ -39,7 +39,11 @@ msgstr ""
 msgid "Audio files opened from Files will appear here"
 msgstr ""
 
-#: src/MainWindow.vala:144
+#: src/MainWindow.vala:80
+msgid "Connect last.fm"
+msgstr ""
+
+#: src/MainWindow.vala:152
 #, c-format
 msgid "%d invalid file was not added to the queue"
 msgid_plural "%d invalid files were not added to the queue"
@@ -48,22 +52,22 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: src/MainWindow.vala:191
+#: src/MainWindow.vala:199
 #, fuzzy
 msgid "Repeat None"
 msgstr "Ponavljaj skladbo"
 
-#: src/MainWindow.vala:195
+#: src/MainWindow.vala:203
 #, fuzzy
 msgid "Repeat All"
 msgstr "Ponovi album"
 
-#: src/MainWindow.vala:199
+#: src/MainWindow.vala:207
 #, fuzzy
 msgid "Repeat One"
 msgstr "Ponavljaj skladbo"
 
-#: src/PlaybackManager.vala:130
+#: src/PlaybackManager.vala:136
 #, c-format
 msgid "%d track was added to the queue"
 msgid_plural "%d tracks were added to the queue"
@@ -73,7 +77,7 @@ msgstr[2] ""
 msgstr[3] ""
 
 #. Don't set artist for files without tags
-#: src/PlaybackManager.vala:190
+#: src/PlaybackManager.vala:196 src/PlaybackManager.vala:204
 msgid "Unknown"
 msgstr "Neznano"
 

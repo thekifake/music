@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: noise\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-31 15:44+0000\n"
+"POT-Creation-Date: 2023-12-10 00:56-0500\n"
 "PO-Revision-Date: 2020-05-12 23:10+0000\n"
 "Last-Translator: nasserbinlaboun <nasser1990com@gmail.com>\n"
 "Language-Team: Arabic <https://l10n.elementary.io/projects/music/music/ar/>\n"
@@ -37,7 +37,11 @@ msgstr ""
 msgid "Audio files opened from Files will appear here"
 msgstr ""
 
-#: src/MainWindow.vala:144
+#: src/MainWindow.vala:80
+msgid "Connect last.fm"
+msgstr ""
+
+#: src/MainWindow.vala:152
 #, c-format
 msgid "%d invalid file was not added to the queue"
 msgid_plural "%d invalid files were not added to the queue"
@@ -48,22 +52,22 @@ msgstr[3] ""
 msgstr[4] ""
 msgstr[5] ""
 
-#: src/MainWindow.vala:191
+#: src/MainWindow.vala:199
 #, fuzzy
 msgid "Repeat None"
 msgstr "أعادة الأغنية"
 
-#: src/MainWindow.vala:195
+#: src/MainWindow.vala:203
 #, fuzzy
 msgid "Repeat All"
 msgstr "أعادة الألبوم"
 
-#: src/MainWindow.vala:199
+#: src/MainWindow.vala:207
 #, fuzzy
 msgid "Repeat One"
 msgstr "أعادة الأغنية"
 
-#: src/PlaybackManager.vala:130
+#: src/PlaybackManager.vala:136
 #, c-format
 msgid "%d track was added to the queue"
 msgid_plural "%d tracks were added to the queue"
@@ -75,7 +79,7 @@ msgstr[4] ""
 msgstr[5] ""
 
 #. Don't set artist for files without tags
-#: src/PlaybackManager.vala:190
+#: src/PlaybackManager.vala:196 src/PlaybackManager.vala:204
 msgid "Unknown"
 msgstr "غير معروف"
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-31 15:44+0000\n"
+"POT-Creation-Date: 2023-12-10 00:56-0500\n"
 "PO-Revision-Date: 2020-02-25 13:09+0000\n"
 "Last-Translator: gkkulik <g.kulik@o2.pl>\n"
 "Language-Team: Silesian <https://l10n.elementary.io/projects/music/music/szl/"
@@ -32,7 +32,11 @@ msgstr ""
 msgid "Audio files opened from Files will appear here"
 msgstr ""
 
-#: src/MainWindow.vala:144
+#: src/MainWindow.vala:80
+msgid "Connect last.fm"
+msgstr ""
+
+#: src/MainWindow.vala:152
 #, c-format
 msgid "%d invalid file was not added to the queue"
 msgid_plural "%d invalid files were not added to the queue"
@@ -40,22 +44,22 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: src/MainWindow.vala:191
+#: src/MainWindow.vala:199
 #, fuzzy
 msgid "Repeat None"
 msgstr "Powtōrz śpiywka"
 
-#: src/MainWindow.vala:195
+#: src/MainWindow.vala:203
 #, fuzzy
 msgid "Repeat All"
 msgstr "Powtōrz śpiywka"
 
-#: src/MainWindow.vala:199
+#: src/MainWindow.vala:207
 #, fuzzy
 msgid "Repeat One"
 msgstr "Powtōrz śpiywka"
 
-#: src/PlaybackManager.vala:130
+#: src/PlaybackManager.vala:136
 #, c-format
 msgid "%d track was added to the queue"
 msgid_plural "%d tracks were added to the queue"
@@ -64,7 +68,7 @@ msgstr[1] ""
 msgstr[2] ""
 
 #. Don't set artist for files without tags
-#: src/PlaybackManager.vala:190
+#: src/PlaybackManager.vala:196 src/PlaybackManager.vala:204
 msgid "Unknown"
 msgstr "Niyznōme"
 
